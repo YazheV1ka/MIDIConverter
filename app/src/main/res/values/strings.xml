@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MIDI Converter</string>
+    <string name="title">Choose to play</string>
+    <string name="settings_title">Settings</string>
+</resources>

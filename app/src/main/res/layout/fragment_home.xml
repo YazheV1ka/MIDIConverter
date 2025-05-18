@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/arbutus"
+        android:text="@string/title"
+        android:textSize="30sp"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/black"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="20dp">
+        <EditText
+            android:id="@+id/search"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="text"
+            android:textColor="@color/black"
+            android:fontFamily="@font/amaranth"
+            android:hint="Search"
+            />
+
+        <ImageView
+            android:id="@+id/search_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:srcCompat="@drawable/search"
+            app:tint="@color/black"/>
+        <ImageView
+            android:id="@+id/sort"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            app:srcCompat="@drawable/sort"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="7dp"
+            app:tint="@color/black"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="30dp"/>
+
+    <Button
+        android:id="@+id/add_new"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add new note"
+        android:textColor="@color/black"
+        android:background="@drawable/btn_back"
+        app:backgroundTint="@null"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"/>
+
+</LinearLayout>

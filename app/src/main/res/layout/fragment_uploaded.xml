@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/arbutus"
+                android:text="Wanna save file to your notes?"
+                android:gravity="center"
+                android:textSize="30sp"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/black"/>
+
+
+            <EditText
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Name *"
+                android:background="@drawable/btn_back"
+                android:padding="10dp"
+                android:textSize="24sp"
+                android:layout_marginTop="50dp"
+                android:layout_marginHorizontal="15dp"
+                android:fontFamily="@font/amaranth"
+                android:textColor="@color/black"/>
+
+            <EditText
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Description(optional)"
+                android:background="@drawable/btn_back"
+                android:padding="10dp"
+                android:textSize="24sp"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="15dp"
+                android:fontFamily="@font/amaranth"
+                android:textColor="@color/black"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="30dp"
+                android:layout_marginHorizontal="15dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Metronome speed"
+                    android:textSize="24sp"
+                    android:gravity="left"
+                    android:layout_marginRight="10dp"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/amaranth"
+                    />
+
+                <EditText
+                    android:id="@+id/metronome_speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:background="@drawable/btn_back"
+                    android:padding="10dp"
+                    android:textSize="24sp"
+                    android:hint="60"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/amaranth"
+                    android:maxLength="10"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="90dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="right">
+
+
+                    <Button
+                        android:id="@+id/yes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10dp"
+                        android:background="@drawable/btn_back"
+                        app:backgroundTint="@null"
+                        android:text="Yes"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/amaranth"
+                        android:textSize="25sp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@+id/no"
+                        />
+                    <Button
+                        android:id="@+id/no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10dp"
+                        android:background="@drawable/btn_back"
+                        app:backgroundTint="@null"
+                        android:text="No"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/amaranth"
+                        android:textSize="25sp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#e62b12"
+                        android:text="you'll have to\ndownload it again"
+                        android:gravity="center"
+                        app:layout_constraintTop_toBottomOf="@id/no"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearProgress"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:alpha="0.8"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="100dp"
+                android:layout_height="100dp"/>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
