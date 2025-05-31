@@ -77,7 +77,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Metronome speed: 60c"
+            android:text="Metronome speed: 100c"
             android:textColor="@color/black"
             android:fontFamily="@font/amaranth"
             android:textSize="20sp"

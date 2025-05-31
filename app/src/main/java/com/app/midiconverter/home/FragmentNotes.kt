@@ -2,7 +2,6 @@ package com.app.quizz.home
 
 import android.app.Activity
 import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -13,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.midiconverter.R
@@ -21,7 +19,6 @@ import com.app.midiconverter.ReadDbHelper
 import com.app.midiconverter.databinding.FragmentHomeBinding
 import com.app.midiconverter.home.DataList
 import com.app.midiconverter.home.ListAdapter
-import com.app.midiconverter.player.FragmentPlay
 import com.app.midiconverter.uploaded.FragmentUploaded
 import java.io.File
 import java.io.FileOutputStream
@@ -30,7 +27,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 
-class FragmentHome : Fragment() {
+class FragmentNotes : Fragment() {
 
     private val binding by lazy { FragmentHomeBinding.inflate(layoutInflater) }
     override fun onCreateView(
@@ -83,7 +80,7 @@ class FragmentHome : Fragment() {
             val search_key = binding.search.text.toString()
             val filteredList : ArrayList<DataList> = ArrayList(
                 listMain.filter{
-                    it.name.contains(search_key) || it.description?.contains(search_key) == true
+                    it.name.lowercase().contains(search_key.lowercase()) || it.description?.lowercase()?.contains(search_key.lowercase()) == true
                 }
             )
             val size = list.size
@@ -96,7 +93,7 @@ class FragmentHome : Fragment() {
 
         binding.sort.setOnClickListener{
             val popupMenu = PopupMenu(requireContext(), binding.sort)
-            popupMenu.getMenuInflater().inflate(R.menu.pop_up_items, popupMenu.getMenu());
+            popupMenu.getMenuInflater().inflate(R.menu.pop_up_items, popupMenu.getMenu())
 
             popupMenu.setOnMenuItemClickListener { menuItem ->
                 val sortedList = if(menuItem.itemId == R.id.menu_name) {
@@ -119,7 +116,6 @@ class FragmentHome : Fragment() {
         val pickFile =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    // Handle the selected file
                     val selectedFileUri: Uri? = result.data?.data
                     selectedFileUri?.let { uri ->
                         handleSelectedFile(uri)
@@ -130,14 +126,13 @@ class FragmentHome : Fragment() {
         binding.addNew.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
-                type = "application/pdf" // Set the MIME type of the files to allow
+                type = "application/pdf"
             }
             pickFile.launch(intent)
         }
     }
     private fun handleSelectedFile(uri: Uri) {
         println("Selected File URI: $uri")
-        // Use ContentResolver to get information about the selected file
         val contentResolver: ContentResolver = requireContext().contentResolver
         val cursor = contentResolver.query(uri, null, null, null, null)
 
@@ -150,10 +145,8 @@ class FragmentHome : Fragment() {
 
                     val inputStream: InputStream? = contentResolver.openInputStream(uri)
 
-                    // Create a new file in internal storage
                     val newFile = createNewFile(displayName)
 
-                    // Copy the content of the selected file to the new file
                     copyFile(inputStream, FileOutputStream(newFile))
 
                     val bundle = Bundle()
@@ -166,9 +159,6 @@ class FragmentHome : Fragment() {
                     fragmentTransaction.addToBackStack("")
                     fragmentTransaction.commit()
                 }
-                // Now, 'displayName' contains the name of the selected file
-                // You can use 'uri' to access the file content
-                // For example, you might want to copy the file to a different location
             }
         }
     }

@@ -1,8 +1,6 @@
 package com.app.midiconverter.player
 
 import android.content.ContentValues
-import android.content.Context
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,8 +17,11 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.app.midiconverter.R
 import com.app.midiconverter.ReadDbHelper
 import com.app.midiconverter.databinding.FragmentPlayBinding
-import com.app.quizz.home.FragmentHome
-import java.time.LocalDate
+import com.app.quizz.home.FragmentNotes
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 
 class FragmentPlay : Fragment() {
@@ -43,17 +44,9 @@ class FragmentPlay : Fragment() {
         val dbHelper = ReadDbHelper(requireContext())
         val db = dbHelper.writableDatabase
 
-        //прибери
-        addStatistic()
-
-        /*binding.back.setOnClickListener{
-            parentFragmentManager.popBackStack()
-        }*/
-
-        //check it
         binding.back.setOnClickListener{
             val fragmentTransaction = parentFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.fragmentContainerView, FragmentHome())
+            fragmentTransaction.replace(R.id.fragmentContainerView, FragmentNotes())
             fragmentTransaction.commit()
         }
 
@@ -84,9 +77,16 @@ class FragmentPlay : Fragment() {
             cursorCourses2.close()
         }
 
-        val currentDateInMillis: Long = System.currentTimeMillis()
+        val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+        formatter.timeZone = TimeZone.getTimeZone("GMT+3")
+
+        val formattedDateString = formatter.format(Date())
+
+        val date: Date = formatter.parse(formattedDateString)!!
+
+        val currentDateInMillis: Long = date.time
         val values2 = ContentValues().apply {
-            put("update_date", currentDateInMillis.toString())
+            put("update_date", currentDateInMillis)
         }
         db.update("NOTES_BD",
             values2,
@@ -111,42 +111,6 @@ class FragmentPlay : Fragment() {
             player.prepare()
             player.play()
         }
-    }
-
-    //check
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun addStatistic(){
-        val sharedPref = requireContext().getSharedPreferences("settings_property", Context.MODE_PRIVATE)
-
-        val last_date = sharedPref.getString("last_date", "")
-        val current_date = LocalDate.now()
-        val strike_day = sharedPref.getInt("strike", 1)
-
-        if (!last_date.isNullOrEmpty() && last_date == current_date.minusDays(1).toString()
-        ) {
-            val edit = sharedPref.edit()
-            edit.putInt("strike", strike_day + 1)
-            edit.putString("last_date", current_date.toString())
-            edit.apply()
-        } else {
-            if (!last_date.isNullOrEmpty() && !last_date.equals(current_date.toString())) {
-                val edit = sharedPref.edit()
-                edit.putInt("strike", 1)
-                edit.apply()
-            } else if (!last_date.isNullOrEmpty() && last_date.equals(current_date.toString())) {
-                val edit = sharedPref.edit()
-                edit.putInt("strike", strike_day)
-                edit.apply()
-            } else if(last_date.isNullOrEmpty()) {
-                val edit = sharedPref.edit()
-                edit.putInt("strike", 1)
-                edit.apply()
-            }
-        }
-
-        val edit = sharedPref.edit()
-        edit.putString("last_date", LocalDate.now().toString())
-        edit.apply()
     }
 
     override fun onDestroyView() {

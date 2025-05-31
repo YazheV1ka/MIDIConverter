@@ -1,20 +1,18 @@
 package com.app.midiconverter.home
 
-import android.content.Context
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.midiconverter.R
-import com.app.midiconverter.ReadDbHelper
 import com.app.midiconverter.databinding.ItemBinding
 import com.app.midiconverter.edit.FragmentEdit
 import com.app.midiconverter.player.FragmentPlay
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class ListAdapter(private val itemList: ArrayList<DataList>, val parentFragmentManager: FragmentManager) : RecyclerView.Adapter<ListAdapter.MyViewHolder>(){
 
@@ -44,11 +42,10 @@ class ListAdapter(private val itemList: ArrayList<DataList>, val parentFragmentM
             binding.title.text = item.name
             binding.description.text = item.description
 
-            //прибери все
             val date = Date(item.update_date!!.toLong())
-            val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm")
-            val formattedDate = dateFormat.format(date)
-            binding.updateDate.text = formattedDate.toString()
+            val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+            formatter.timeZone = TimeZone.getTimeZone("GMT+3")
+            binding.updateDate.text = formatter.format(date)
         }
     }
 

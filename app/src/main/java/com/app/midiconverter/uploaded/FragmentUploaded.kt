@@ -18,17 +18,16 @@ import com.app.midiconverter.R
 import com.app.midiconverter.ReadDbHelper
 import com.app.midiconverter.databinding.FragmentUploadedBinding
 import com.app.midiconverter.player.FragmentPlay
+import com.bumptech.glide.Glide
+import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
-import okio.Buffer
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -38,13 +37,18 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.ZoneId
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import java.util.zip.ZipInputStream
 
 
 class FragmentUploaded : Fragment() {
     private val binding by lazy { FragmentUploadedBinding.inflate(layoutInflater) }
-    private val BASE_URL = "http://127.0.0.1:5000"
+    private val BASE_URL = "https://detail-urge-foster-ripe.trycloudflare.com"
 
     val apiService: ApiService by lazy {
         val retrofit = Retrofit.Builder()
@@ -60,7 +64,7 @@ class FragmentUploaded : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return  binding.root
+        return binding.root
     }
 
     private var file_id = -1
@@ -89,78 +93,107 @@ class FragmentUploaded : Fragment() {
         binding.linearProgress.setOnClickListener { }
 
         binding.yes.setOnClickListener {
-            addStatistic()
-            if (binding.name.text.toString() != ""){
-                //save file here
-                if(binding.metronomeSpeed.text.toString().isNullOrEmpty()) {
-                    addRequest(multiPart, 60)
-                }else{
+            if (binding.name.text.toString() != "") {
+                if (binding.metronomeSpeed.text.toString().isNullOrEmpty()) {
+                    addRequest(multiPart, 100)
+                } else {
                     addRequest(multiPart, Integer.parseInt(binding.metronomeSpeed.text.toString()))
                 }
-            }else{
-                Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Please fill all required fields",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
 
         binding.no.setOnClickListener {
-            addStatistic()
-            if (binding.name.text.toString() != ""){
-                if(binding.metronomeSpeed.text.toString().isNullOrEmpty()) {
-                    addRequest(multiPart, 60)
-                }else{
-                    addRequest(multiPart, Integer.parseInt(binding.metronomeSpeed.text.toString()))
+            if (binding.name.text.toString() != "") {
+                if (binding.metronomeSpeed.text.toString().isNullOrEmpty()) {
+                    addRequest(multiPart, 100, false)
+                } else {
+                    addRequest(
+                        multiPart,
+                        Integer.parseInt(binding.metronomeSpeed.text.toString()),
+                        false
+                    )
 
                 }
-                val bundle = bundleOf("mp3" to "", "bpm" to binding.metronomeSpeed.text.toString())
-                /*val fragment = FragmentPlay()
-                fragment.arguments = bundle
-                val fragmentTransaction = parentFragmentManager.beginTransaction()
-                fragmentTransaction.replace(R.id.fragmentContainerView, fragment)
-                fragmentTransaction.commit()*/
-            }else{
-                Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Please fill all required fields",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun addStatistic(){
-        val sharedPref = requireContext().getSharedPreferences("settings_property", Context.MODE_PRIVATE)
+    fun addStatistic() {
+        val sharedPref =
+            requireContext().getSharedPreferences("settings_property", Context.MODE_PRIVATE)
         val edit = sharedPref.edit()
-        edit.putString("last_date", LocalDate.now().toString())
+        edit.putString("update_date", LocalDate.now(ZoneId.of("GMT+3")).toString())
         edit.apply()
-        println("last date: ${LocalDate.now().toString()}")
+        println("last date: ${LocalDate.now(ZoneId.of("GMT+3")).toString()}")
     }
 
-    fun addRequest(file: MultipartBody.Part, metronome_speed:Int, save: Boolean = true){
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun addRequest(file: MultipartBody.Part, metronome_speed: Int, save: Boolean = true) {
 
         binding.linearProgress.isVisible = true
+        binding.loadingGif.isVisible = true
+        binding.loadingText.isVisible = true
+        binding.loadingText.text = "Rendering..."
+
+        Glide.with(requireContext())
+            .asGif()
+            .load(R.drawable.rendering_gif)
+            .into(binding.loadingGif)
 
         val call: Call<ResponseBody> = apiService.createFile(metronome_speed, file)
 
         call.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
-                    // Handle success
                     val responseData = response.body()?.string()
-                    // Process responseData as needed
-                    println("response ${responseData}")
+                    println("response $responseData")
+
+                    val tabLayout = requireActivity().findViewById<TabLayout>(R.id.tablayout)
+                    for (i in 0 until tabLayout.tabCount) {
+                        tabLayout.getTabAt(i)?.view?.isEnabled = false
+                    }
 
                     lifecycleScope.launch(Dispatchers.Main) {
-                        processWithSuccessRequest(save)
-                        //допиши
-                        /*withContext(Dispatchers.IO) {
+                        binding.loadingText.text = "Rendering audio file..."
+
+                        withContext(Dispatchers.IO) {
                             Thread.sleep(40000)
                         }
+
+                        binding.loadingText.text = "Rendering video file..."
+
+                        withContext(Dispatchers.IO) {
+                            Thread.sleep(40000)
+                        }
+
                         if (responseData != null) {
                             processWithSuccessRequest(save, responseData)
-                        }*/
+                        }
+
+                        binding.loadingGif.isVisible = false
+                        binding.loadingText.isVisible = false
+                        binding.linearProgress.isVisible = false
+
+                        for (i in 0 until tabLayout.tabCount) {
+                            tabLayout.getTabAt(i)?.view?.isEnabled = true
+                        }
                     }
                 } else {
-                    println("response not succesful ${response.message()}")
-
                     binding.linearProgress.isVisible = false
-                    Toast.makeText(requireContext(), "Cannot process file", Toast.LENGTH_LONG)
+                    Toast.makeText(requireContext(), "Cannot process file. Choose a smaller file", Toast.LENGTH_LONG)
                         .show()
                 }
             }
@@ -168,7 +201,7 @@ class FragmentUploaded : Fragment() {
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Toast.makeText(
                     requireContext(),
-                    "Something went wrong. Please check your file",
+                    "Something went wrong. Please check your file" + t.message,
                     Toast.LENGTH_LONG
                 ).show()
                 t.printStackTrace()
@@ -233,37 +266,47 @@ class FragmentUploaded : Fragment() {
         return extractedFiles
     }
 
-    //?
-    fun createNewFile(fileName: String): File {
-        val storageDir = requireContext().cacheDir
-        return File.createTempFile(fileName, null, storageDir)
-    }
-
-    private suspend fun processWithSuccessRequest(save: Boolean) {
+    private suspend fun processWithSuccessRequest(save: Boolean, responseData: String) {
         val file2 = requireContext().cacheDir
 
-        val zipFile = lifecycleScope.async(Dispatchers.IO) {
-            //допиши + responseData
-            downloadFile(
-                "http://127.0.0.1:5000",
-                file2.absolutePath
-            )
-        }.await()
+        val zipFile = try {
+            withContext(Dispatchers.IO) {
+                downloadFile(
+                    "https://detail-urge-foster-ripe.trycloudflare.com/file/" + responseData,
+                    file2.absolutePath
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    requireContext(),
+                    "Cannot process file. Server shutdown or Choose smaller file",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            return
+        }
 
         val extractedFiles = unzip(zipFile, file2.absolutePath)
-        if(save) {
+        if (save) {
             val dbHelper = ReadDbHelper(requireContext())
 
             val db = dbHelper.writableDatabase
+            val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+            formatter.timeZone = TimeZone.getTimeZone("GMT+3")
 
-            val currentDateInMilliseconds = System.currentTimeMillis()
+            val formattedDateString = formatter.format(Date())
+
+            val date: Date = formatter.parse(formattedDateString)!!
+            val currentDateInMilliseconds = date.time
 
             val values2 = ContentValues().apply {
                 put("name", binding.name.text.toString())
                 put("path", file.absolutePath)
-                if(binding.metronomeSpeed.text.toString().isNullOrEmpty()) {
-                    put("metronome_bpm", 60)
-                }else{
+                if (binding.metronomeSpeed.text.toString().isNullOrEmpty()) {
+                    put("metronome_bpm", 100)
+                } else {
                     put("metronome_bpm", binding.metronomeSpeed.text.toString())
                 }
                 put("mp3_path", extractedFiles[0].absolutePath)
@@ -287,7 +330,7 @@ class FragmentUploaded : Fragment() {
                 put("name", binding.name.text.toString())
                 put("description", binding.description.text.toString())
                 put("file_Id", file_id)
-                put("update_date", currentDateInMilliseconds.toString())
+                put("update_date", currentDateInMilliseconds)
             }
 
             val newRowId = db?.insert("NOTES_BD", null, values)
@@ -295,21 +338,16 @@ class FragmentUploaded : Fragment() {
             val fragment = FragmentPlay()
             fragment.arguments = bundleOf("file_id" to file_id)
 
-            //?
-            parentFragmentManager.popBackStack()
-
             val fragmentTransaction = parentFragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragmentContainerView, fragment)
-            //?
-            fragmentTransaction.addToBackStack("")
             fragmentTransaction.commit()
-        }else{
+        } else {
             val bundle = Bundle()
             bundle.putString("mp3", extractedFiles[0].absolutePath)
             bundle.putString("mp4", extractedFiles[1].absolutePath)
-            if(binding.metronomeSpeed.text.toString().isNullOrEmpty()) {
-                bundle.putString("bpm", "60")
-            }else{
+            if (binding.metronomeSpeed.text.toString().isNullOrEmpty()) {
+                bundle.putString("bpm", "100")
+            } else {
                 bundle.putString("bpm", binding.metronomeSpeed.text.toString())
             }
             parentFragmentManager.popBackStack()
@@ -318,8 +356,6 @@ class FragmentUploaded : Fragment() {
             fragment.arguments = bundle
             val fragmentTransaction = parentFragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragmentContainerView, fragment)
-            //?
-            fragmentTransaction.addToBackStack("")
             fragmentTransaction.commit()
         }
     }

@@ -38,8 +38,6 @@ class ReadDbHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
         db.execSQL(SQL_STATISTIC)
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
         db.execSQL(SQL_DELETE_ENTRIES)
         onCreate(db)
     }
@@ -47,7 +45,6 @@ class ReadDbHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
         onUpgrade(db, oldVersion, newVersion)
     }
     companion object {
-        // If you change the database schema, you must increment the database version.
         const val DATABASE_VERSION = 1
         const val DATABASE_NAME = "Notes.db"
     }

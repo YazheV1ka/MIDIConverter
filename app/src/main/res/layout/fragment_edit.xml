@@ -46,6 +46,8 @@
             android:fontFamily="@font/amaranth"
             android:textColor="@color/black"/>
 
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -73,11 +75,31 @@
                 android:background="@drawable/btn_back"
                 android:padding="10dp"
                 android:textSize="24sp"
-                android:hint="60"
+                android:hint="100"
                 android:textColor="@color/black"
                 android:fontFamily="@font/amaranth"
                 android:maxLength="10"
                 android:gravity="center"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
+            android:layout_marginHorizontal="15dp">
+
+            <TextView
+                android:id="@+id/update_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="-100dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/amaranth"
+                android:gravity="center"
+                android:text="Update Date:"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -102,13 +124,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
-                android:background="@drawable/btn_back"
+                android:background="@drawable/btn_red_border"
                 app:backgroundTint="@null"
                 android:text="Delete"
                 android:textColor="@color/black"
                 android:fontFamily="@font/amaranth"
                 android:textSize="25sp"/>
         </LinearLayout>
+
+
     </LinearLayout>
 
 
